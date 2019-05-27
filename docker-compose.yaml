@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+
+  rabbitmq:
+    image: rabbitmq
+    command: rabbitmq-server
+    expose:
+      - 5672
+      - 15672
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+
+  sender:
+    build:
+      dockerfile: Dockerfile
+      context: ./sender
+    # Keep it running
+    tty: true
+    volumes:
+      - /app/node_modules
+      - ./sender:/app
+
+  receiver:
+    build:
+      dockerfile: Dockerfile
+      context: ./receiver
+    # Keep it running
+    tty: true
+    volumes:
+      - /app/node_modules
+      - ./receiver:/app
